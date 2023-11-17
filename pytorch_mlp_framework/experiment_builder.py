@@ -155,6 +155,10 @@ class ExperimentBuilder(nn.Module):
         ########################################
         for n, p in named_parameters:
             if(p.requires_grad) and ("bias" not in n):
+                n.replace('layer_dict.','')
+                n = n.split('.')
+                del n[-1]
+                n = '_'.join(n)
                 layers.append(n)
                 all_grads.append(p.grad.abs().mean().cpu().numpy())
         ########################################
