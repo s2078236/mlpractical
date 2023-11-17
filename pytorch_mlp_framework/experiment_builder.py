@@ -128,6 +128,7 @@ class ExperimentBuilder(nn.Module):
         :param layers: Layer names corresponding to the model parameters
         :return: plot for gradient flow
         """
+        all_grads = all_grads.cpu().numpy()
         plt.plot(all_grads, alpha=0.3, color="b")
         plt.hlines(0, 0, len(all_grads)+1, linewidth=1, color="k" )
         plt.xticks(range(0,len(all_grads), 1), layers, rotation="vertical")
