@@ -158,6 +158,7 @@ class ExperimentBuilder(nn.Module):
             if(p.requires_grad) and ("bias" not in n):
                 layers.append(n)
                 all_grads.append(p.grad.abs().mean())
+                print(f"{n} grad plot : {all_grads[-1]}")
         ########################################
             
         
