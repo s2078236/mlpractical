@@ -298,7 +298,7 @@ class ExperimentBuilder(nn.Module):
             
             ################################################################
             ##### Plot Gradient Flow at each Epoch during Training  ######
-            print("Generating Gradient Flow Plot at epoch {}".format(epoch_idx))
+            print("Generatng Gradient Flow Plot at epoch {}".format(epoch_idx))
             plt = self.plot_grad_flow(self.model.named_parameters())
             if not os.path.exists(os.path.join(self.experiment_saved_models, 'gradient_flow_plots')):
                 os.mkdir(os.path.join(self.experiment_saved_models, 'gradient_flow_plots'))
