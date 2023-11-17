@@ -155,6 +155,7 @@ class ExperimentBuilder(nn.Module):
         """
         ########################################
         for n, p in named_parameters:
+            print(f"{n} grad_plot : {p.requires_grad}")
             if(p.requires_grad) and ("bias" not in n):
                 layers.append(n)
                 all_grads.append(p.grad.abs().mean())
