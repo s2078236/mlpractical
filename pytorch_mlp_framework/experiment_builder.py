@@ -128,7 +128,6 @@ class ExperimentBuilder(nn.Module):
         :param layers: Layer names corresponding to the model parameters
         :return: plot for gradient flow
         """
-        all_grads = all_grads.cpu().numpy()
         plt.plot(all_grads, alpha=0.3, color="b")
         plt.hlines(0, 0, len(all_grads)+1, linewidth=1, color="k" )
         plt.xticks(range(0,len(all_grads), 1), layers, rotation="vertical")
@@ -150,17 +149,14 @@ class ExperimentBuilder(nn.Module):
         """
         all_grads = []
         layers = []
-        print(f"hiiiiiiiiiiiiiiiiii {named_parameters}")
         """
         Complete the code in the block below to collect absolute mean of the gradients for each layer in all_grads with the             layer names in layers.
         """
         ########################################
         for n, p in named_parameters:
-            print(f"{n} grad_plot : {p.requires_grad}")
             if(p.requires_grad) and ("bias" not in n):
                 layers.append(n)
-                all_grads.append(p.grad.abs().mean())
-                print(f"{n} grad plot : {all_grads[-1]}")
+                all_grads.append(p.grad.abs().mean().cpu().numpy())
         ########################################
             
         
