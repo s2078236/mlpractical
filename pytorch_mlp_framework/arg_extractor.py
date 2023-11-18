@@ -52,6 +52,7 @@ def get_args():
                         help='convolutional block with residual connection')
     parser.add_argument('--withBN', type=str2bool, default=False,
                         help='convolutional block with batch normalization')
+    parser.add_argument('--lr', nargs="?", type=float, default=1e-3, help='Number of classes in the dataset')
     args = parser.parse_args()
     print(args)
     return args
