@@ -345,7 +345,7 @@ class ConvolutionalNetwork(nn.Module):
 
 class ConvolutionalProcessingBlockNoVanishment(nn.Module):
     def __init__(self, input_shape, num_filters, kernel_size, padding, bias, dilation,conv_withRC = False, conv_withBN = False):
-        super(ConvolutionalProcessingBlock, self).__init__()
+        super(ConvolutionalProcessingBlockNoVanishment, self).__init__()
 
         self.num_filters = num_filters
         self.kernel_size = kernel_size
