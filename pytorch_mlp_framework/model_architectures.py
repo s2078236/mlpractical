@@ -79,7 +79,7 @@ class FCCNetwork(nn.Module):
 
 class EmptyBlock(nn.Module):
     def __init__(self, input_shape=None, num_filters=None, kernel_size=None, padding=None, bias=None, dilation=None,
-                 reduction_factor=None):
+                 reduction_factor=None, withRC = None, withBN = False):
         super(EmptyBlock, self).__init__()
 
         self.num_filters = num_filters
@@ -142,7 +142,7 @@ class EntryConvolutionalBlock(nn.Module):
 
 
 class ConvolutionalProcessingBlock(nn.Module):
-    def __init__(self, input_shape, num_filters, kernel_size, padding, bias, dilation):
+    def __init__(self, input_shape, num_filters, kernel_size, padding, bias, dilation, withRC = None, withBN = None):
         super(ConvolutionalProcessingBlock, self).__init__()
 
         self.num_filters = num_filters
@@ -188,7 +188,7 @@ class ConvolutionalProcessingBlock(nn.Module):
 
 
 class ConvolutionalDimensionalityReductionBlock(nn.Module):
-    def __init__(self, input_shape, num_filters, kernel_size, padding, bias, dilation, reduction_factor):
+    def __init__(self, input_shape, num_filters, kernel_size, padding, bias, dilation, reduction_factor, withRC = None, withBN = None):
         super(ConvolutionalDimensionalityReductionBlock, self).__init__()
 
         self.num_filters = num_filters
@@ -292,7 +292,7 @@ class ConvolutionalNetwork(nn.Module):
                                                                                          bias=self.use_bias,
                                                                                          kernel_size=3, dilation=1,
                                                                                          padding=1, 
-                                                                                         conv_withRC = self.withRC, conv_withBN = self.withBN)
+                                                                                         withRC = self.withRC, withBN = self.withBN)
                 out = self.layer_dict['block_{}_{}'.format(i, j)].forward(out)
             self.layer_dict['reduction_block_{}'.format(i)] = self.dimensionality_reduction_block_type(
                 input_shape=out.shape,
@@ -300,7 +300,7 @@ class ConvolutionalNetwork(nn.Module):
                 kernel_size=3, dilation=1,
                 padding=1,
                 reduction_factor=2,
-                conv_withBN = self.withBN)
+                withBN = self.withBN)
             out = self.layer_dict['reduction_block_{}'.format(i)].forward(out)
 
         out = F.avg_pool2d(out, out.shape[-1])
@@ -344,7 +344,7 @@ class ConvolutionalNetwork(nn.Module):
         self.logit_linear_layer.reset_parameters()
 
 class ConvolutionalProcessingBlockNoVanishment(nn.Module):
-    def __init__(self, input_shape, num_filters, kernel_size, padding, bias, dilation,conv_withRC = False, conv_withBN = False):
+    def __init__(self, input_shape, num_filters, kernel_size, padding, bias, dilation,withRC = False, withBN = False):
         super(ConvolutionalProcessingBlockNoVanishment, self).__init__()
 
         self.num_filters = num_filters
@@ -353,8 +353,8 @@ class ConvolutionalProcessingBlockNoVanishment(nn.Module):
         self.padding = padding
         self.bias = bias
         self.dilation = dilation
-        self.conv_withRC = conv_withRC
-        self.conv_withBN = conv_withBN
+        self.withRC = withRC
+        self.withBN = withBN
 
         self.build_module()
 
@@ -369,7 +369,7 @@ class ConvolutionalProcessingBlockNoVanishment(nn.Module):
 
         out = self.layer_dict['conv_0'].forward(out)
 
-        if self.conv_withBN:
+        if self.withBN:
             self.layer_dict['bn_0'] = nn.BatchNorm2d(num_features=out.shape[1])
             out = self.layer_dict['bn_0'].forward(out)
 
@@ -381,7 +381,7 @@ class ConvolutionalProcessingBlockNoVanishment(nn.Module):
 
         out = self.layer_dict['conv_1'].forward(out)
 
-        if self.conv_withBN:
+        if self.withBN:
             self.layer_dict['bn_1'] = nn.BatchNorm2d(num_features=out.shape[1])
             out = self.layer_dict['bn_1'].forward(out)
 
@@ -393,15 +393,15 @@ class ConvolutionalProcessingBlockNoVanishment(nn.Module):
         out = x
 
         out = self.layer_dict['conv_0'].forward(out)
-        if self.conv_withBN:
+        if self.withBN:
             out = self.layer_dict['bn_0'].forward(out)
 
         out = F.leaky_relu(out)
 
         out = self.layer_dict['conv_1'].forward(out)
-        if self.conv_withBN:
+        if self.withBN:
             out = self.layer_dict['bn_1'].forward(out)
-        if self.conv_withRC:
+        if self.withRC:
             out = out + x
         out = F.leaky_relu(out)
 
@@ -409,7 +409,7 @@ class ConvolutionalProcessingBlockNoVanishment(nn.Module):
 
 
 class ConvolutionalDimensionalityReductionBlockNoVanishment(nn.Module):
-    def __init__(self, input_shape, num_filters, kernel_size, padding, bias, dilation, reduction_factor, conv_withBN = False):
+    def __init__(self, input_shape, num_filters, kernel_size, padding, bias, dilation, reduction_factor, withBN = False):
         super(ConvolutionalDimensionalityReductionBlockNoVanishment, self).__init__()
 
         self.num_filters = num_filters
@@ -419,7 +419,7 @@ class ConvolutionalDimensionalityReductionBlockNoVanishment(nn.Module):
         self.bias = bias
         self.dilation = dilation
         self.reduction_factor = reduction_factor
-        self.conv_withBN = conv_withBN
+        self.withBN = withBN
         self.build_module()
 
 
@@ -434,7 +434,7 @@ class ConvolutionalDimensionalityReductionBlockNoVanishment(nn.Module):
 
         out = self.layer_dict['conv_0'].forward(out)
 
-        if self.conv_withBN:
+        if self.withBN:
             self.layer_dict['bn_0'] = nn.BatchNorm2d(num_features=out.shape[1])
             out = self.layer_dict['bn_0'].forward(out)
 
@@ -448,7 +448,7 @@ class ConvolutionalDimensionalityReductionBlockNoVanishment(nn.Module):
 
         out = self.layer_dict['conv_1'].forward(out)
 
-        if self.conv_withBN:
+        if self.withBN:
             self.layer_dict['bn_1'] = nn.BatchNorm2d(num_features=out.shape[1])
             out = self.layer_dict['bn_1'].forward(out)
 
@@ -460,14 +460,14 @@ class ConvolutionalDimensionalityReductionBlockNoVanishment(nn.Module):
         out = x
 
         out = self.layer_dict['conv_0'].forward(out)
-        if self.conv_withBN:
+        if self.withBN:
             out = self.layer_dict['bn_0'].forward(out)
         out = F.leaky_relu(out)
 
         out = F.avg_pool2d(out, self.reduction_factor)
 
         out = self.layer_dict['conv_1'].forward(out)
-        if self.conv_withBN:
+        if self.withBN:
             out = self.layer_dict['bn_1'].forward(out)
         out = F.leaky_relu(out)
 
